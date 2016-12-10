@@ -1,4 +1,4 @@
-package com.dive.camerasub.camerasub;
+package com.dive.camerasub;
 
 import org.junit.Test;
 

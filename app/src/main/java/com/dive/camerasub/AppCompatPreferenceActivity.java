@@ -1,4 +1,4 @@
-package com.dive.camerasub.camerasub;
+package com.dive.camerasub;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
