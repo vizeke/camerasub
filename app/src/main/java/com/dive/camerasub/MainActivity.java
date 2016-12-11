@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private Intent _serviceIntent;
 
     public void startMainIntentService(View v){
-        MainIntentService.startActionTakePictures(this, 10, this.receiver);
+        MainIntentService.startActionTakePictures(this, 5, this.receiver);
     }
 
     // Setup the callback for when data is received from the service
@@ -87,10 +87,12 @@ public class MainActivity extends AppCompatActivity {
 
         if (isRunning){
             serviceDescription.setText("Service started at: " + sdf.format(currentDate));
-            button.setText("Stop Service");
+            button.setText("Service Running");
+            button.setEnabled(false);
         }else {
             serviceDescription.setText("Service stoped at: " + sdf.format(currentDate));
             button.setText("Start Service");
+            button.setEnabled(true);
         }
     }
 }
