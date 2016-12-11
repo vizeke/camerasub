@@ -19,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/header_activate_button_title"
-        android:onClick="toggleMainService"/>
+        android:onClick="startMainIntentService"/>
 
     <TextView
         android:id="@+id/service_description"

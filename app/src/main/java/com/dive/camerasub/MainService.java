@@ -4,16 +4,33 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
+import java.util.Date;
+
 public class MainService extends Service {
 
     private boolean isRunning;
+    private Date lastUpdate;
 
     public boolean isRunning() {
         return isRunning;
     }
 
     public MainService() {
+    }
+
+    @Override
+    public void onCreate(){
+        super.onCreate();
+
         this.isRunning = false;
+        this.lastUpdate = null;
+    }
+
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        this.lastUpdate = new Date();
+        this.isRunning = true;
+
+        return Service.START_NOT_STICKY;
     }
 
     @Override
@@ -22,15 +39,12 @@ public class MainService extends Service {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    public void toggleService(){
-        this.isRunning = !this.isRunning;
-    }
-
-    public void startService(){
-        this.isRunning = true;
-    }
-
     public void stopService() {
+        this.lastUpdate = new Date();
         this.isRunning = false;
+    }
+
+    private void doSomething(){
+
     }
 }

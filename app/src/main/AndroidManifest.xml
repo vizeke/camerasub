@@ -10,7 +10,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/app_name"></activity>
+            android:label="@string/app_name" />
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
@@ -24,8 +24,10 @@
 
         <service
             android:name=".MainService"
-            android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+        <service
+            android:name=".MainIntentService"
+            android:exported="false"></service>
     </application>
 
 </manifest>
