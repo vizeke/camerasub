@@ -1,6 +1,8 @@
 package com.dive.camerasub;
 
+import android.content.Context;
 import android.content.Intent;
+import android.hardware.camera2.CameraManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -70,6 +72,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void takeSavePicture(View v) {
+        CameraHandler cameraHandler = new CameraHandler((CameraManager) getSystemService(Context.CAMERA_SERVICE), this);
+        cameraHandler.startStuff();
     }
 
     private void setInfoService( boolean isRunning ){

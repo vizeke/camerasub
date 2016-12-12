@@ -14,6 +14,13 @@
     tools:showIn="@layout/activity_main">
 
     <Button
+        android:id="@+id/take_save_picture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Take Save Picture"
+        android:onClick="takeSavePicture" />
+
+    <Button
         android:id="@+id/toggle_service"
         android:layout_centerInParent="true"
         android:layout_width="wrap_content"
