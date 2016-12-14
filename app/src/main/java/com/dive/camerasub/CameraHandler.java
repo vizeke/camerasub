@@ -18,6 +18,7 @@ import android.media.ImageReader;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
@@ -50,7 +51,7 @@ public class CameraHandler {
     private Activity _currentActivity;
     private CaptureRequest.Builder _cameraDefaultRequest;
     private DisplayMetrics _metrics = new DisplayMetrics();
-
+    private Handler mBackgroundHandler;
 
     public CameraHandler(CameraManager cameraManager, Activity currentActivity){
         this._cameraManager = cameraManager;
@@ -88,7 +89,7 @@ public class CameraHandler {
             WindowManager wm = (WindowManager)_currentActivity.getSystemService(Context.WINDOW_SERVICE);
             wm.getDefaultDisplay().getMetrics(_metrics);
 
-            ImageReader imageReader = ImageReader.newInstance( _metrics.widthPixels, _metrics.heightPixels, PixelFormat.RGBA_8888, 1 );
+            ImageReader imageReader = ImageReader.newInstance( _metrics.widthPixels, _metrics.heightPixels, ImageFormat.JPEG, 1 );
             imageReader.setOnImageAvailableListener(imageReaderListener, null);
             Surface defaultSurface = imageReader.getSurface();
             List<Surface> surfaceList = Collections.singletonList(defaultSurface);
@@ -143,47 +144,18 @@ public class CameraHandler {
         @Override
         public void onImageAvailable(ImageReader imageReader) {
 
-            Image image = null;
-            Bitmap bitmap = null;
-            image = imageReader.acquireLatestImage();
-            Image.Plane[] planes = image.getPlanes();
-            Buffer buffer = planes[0].getBuffer().rewind();
-            bitmap = Bitmap.createBitmap( 864, 1421, Bitmap.Config.ARGB_8888);
-            bitmap.copyPixelsFromBuffer(buffer);
+            File externalFile = new File(_currentActivity.getExternalFilesDir(null), createStringDate() + ".jpeg");
+            ImageHandler.ImageSaver imageSaver = new ImageHandler.ImageSaver(imageReader.acquireNextImage(), externalFile);
+            imageSaver.run();
 
-            FileOutputStream outputStream = null;
-
-            try {
-
-                File externalFile = new File(_currentActivity.getExternalFilesDir(null), createStringDate() + ".jpeg");
-                outputStream = new FileOutputStream(externalFile);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream );
-
-                // Tell the media scanner about the new file so that it is
-                // immediately available to the user.
-                MediaScannerConnection.scanFile(_currentActivity,
-                        new String[] { externalFile.toString() }, null,
-                        new MediaScannerConnection.OnScanCompletedListener() {
-                            public void onScanCompleted(String path, Uri uri) {
-                                Log.i("ExternalStorage", "Scanned " + path + ":");
-                                Log.i("ExternalStorage", "-> uri=" + uri);
-                            }
-                        });
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    outputStream.close();
-                    image.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-
-
-
+            MediaScannerConnection.scanFile(_currentActivity,
+                    new String[] { externalFile.toString() }, null,
+                    new MediaScannerConnection.OnScanCompletedListener() {
+                        public void onScanCompleted(String path, Uri uri) {
+                            Log.i("ExternalStorage", "Scanned " + path + ":");
+                            Log.i("ExternalStorage", "-> uri=" + uri);
+                        }
+                    });
         }
     };
 
