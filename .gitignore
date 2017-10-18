@@ -9,3 +9,5 @@
 .externalNativeBuild
 
 camesub.keystore.jks
+
+app/src/main/res/client_id.json
