@@ -1,4 +1,4 @@
 {
-    "timeLoop": 10000,
+    "timeLoop": 60000,
     "defaultFolder": "CameraSub"
 }
