@@ -1,9 +1,5 @@
 package com.dive.camerasub;
 
-/**
- * Created by vinicius.barbosa on 14/12/2016.
- */
-
 /*
  * Copyright 2014 The Android Open Source Project
  *
@@ -62,6 +58,8 @@ package com.dive.camerasub;
         import android.view.View;
         import android.view.ViewGroup;
         import android.widget.Toast;
+
+        import org.json.JSONObject;
 
         import java.io.File;
         import java.io.FileOutputStream;
@@ -250,7 +248,7 @@ public class Camera2BasicFragment extends Fragment
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
+            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile, new CreateDriveFile((CameraActivity) getActivity())));
         }
 
     };
@@ -434,6 +432,28 @@ public class Camera2BasicFragment extends Fragment
         view.findViewById(R.id.picture).setOnClickListener(this);
         view.findViewById(R.id.info).setOnClickListener(this);
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
+
+        this.loop();
+    }
+
+    // private int picturesTaken = 0;
+
+    private ConfigurationUpdater configUpdater = new ConfigurationUpdater();
+
+    private void loop() {
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        configUpdater.UpdateAppConfiguration();
+
+                        takePicture();
+
+                        // if (++picturesTaken < 10) {
+                        loop();
+                        // }
+                    }
+                },
+                com.dive.camerasub.Configuration.mTimeLoop);
     }
 
     private String createStringDate(){
@@ -1018,9 +1038,12 @@ public class Camera2BasicFragment extends Fragment
          */
         private final File mFile;
 
-        public ImageSaver(Image image, File file) {
+        private final CreateDriveFile mDriveFile;
+
+        public ImageSaver(Image image, File file, CreateDriveFile driveFile) {
             mImage = image;
             mFile = file;
+            mDriveFile = driveFile;
         }
 
         @Override
@@ -1032,6 +1055,7 @@ public class Camera2BasicFragment extends Fragment
             try {
                 output = new FileOutputStream(mFile);
                 output.write(bytes);
+                mDriveFile.SavePicture(mFile, bytes);
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
