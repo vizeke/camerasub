@@ -23,6 +23,8 @@ public class CameraActivity extends AppCompatActivity implements
 
     private GoogleApiClient mGoogleApiClient;
 
+    public static final String FRAGALARMTAG = "AlarmFragment";
+
     /**
      * Getter for the {@code GoogleApiClient}.
      */

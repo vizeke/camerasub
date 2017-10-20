@@ -18,12 +18,15 @@ package com.dive.camerasub;
 
         import android.Manifest;
         import android.app.Activity;
+        import android.app.AlarmManager;
         import android.app.AlertDialog;
         import android.app.Dialog;
         import android.app.DialogFragment;
         import android.app.Fragment;
+        import android.app.PendingIntent;
         import android.content.Context;
         import android.content.DialogInterface;
+        import android.content.Intent;
         import android.content.pm.PackageManager;
         import android.content.res.Configuration;
         import android.graphics.ImageFormat;
@@ -46,6 +49,7 @@ package com.dive.camerasub;
         import android.os.Bundle;
         import android.os.Handler;
         import android.os.HandlerThread;
+        import android.os.SystemClock;
         import android.support.annotation.NonNull;
         import android.support.v13.app.FragmentCompat;
         import android.support.v4.content.ContextCompat;
@@ -58,8 +62,6 @@ package com.dive.camerasub;
         import android.view.View;
         import android.view.ViewGroup;
         import android.widget.Toast;
-
-        import org.json.JSONObject;
 
         import java.io.File;
         import java.io.FileOutputStream;
@@ -427,33 +429,26 @@ public class Camera2BasicFragment extends Fragment
         return inflater.inflate(R.layout.fragment_camera2_basic, container, false);
     }
 
+
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         view.findViewById(R.id.picture).setOnClickListener(this);
         view.findViewById(R.id.info).setOnClickListener(this);
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
 
-        this.loop();
+        delayTakePicture();
     }
-
-    // private int picturesTaken = 0;
 
     private ConfigurationUpdater configUpdater = new ConfigurationUpdater();
 
-    private void loop() {
+    private void delayTakePicture() {
         new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
                         configUpdater.UpdateAppConfiguration();
-
                         takePicture();
-
-                        // if (++picturesTaken < 10) {
-                        loop();
-                        // }
                     }
-                },
-                com.dive.camerasub.Configuration.mTimeLoop);
+                }, 5000 );
     }
 
     private String createStringDate(){
@@ -998,10 +993,24 @@ public class Camera2BasicFragment extends Fragment
         }
     }
 
+    public void SetAlarm(Activity activity){
+        Intent intent = new Intent(activity, CameraActivity.class);
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+        int alarmType = AlarmManager.ELAPSED_REALTIME;
+        final int INTERVAL = 15000;
+
+        PendingIntent mPendingIntent = PendingIntent.getBroadcast(activity, 0, intent, 0);
+        AlarmManager mAlarmMgr = (AlarmManager)activity.getSystemService(activity.ALARM_SERVICE);
+        mAlarmMgr.setRepeating(alarmType, SystemClock.elapsedRealtime() + INTERVAL, INTERVAL, mPendingIntent);
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.picture: {
+                SetAlarm(getActivity());
                 takePicture();
                 break;
             }
